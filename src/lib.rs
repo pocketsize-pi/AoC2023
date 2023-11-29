@@ -3,9 +3,18 @@
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
+pub enum InputType {
+    Sample,
+    Data
+}
 
-fn read_input(day: &i8) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
-    let file = File::open("data.txt")?;
+pub fn read_input(day: u8, input: InputType) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
+    
+    let file_name = match input {
+        InputType::Sample => format!("src/day{:02}_sample.txt",day),
+        InputType::Data=> format!("src/day{:02}_input.txt",day),
+    };
+    let file = File::open(file_name)?;
     let reader = BufReader::new(file);
 
     let mut data = Vec::new();
