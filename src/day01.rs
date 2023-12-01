@@ -73,7 +73,105 @@ pub fn day01() -> Result<(), Box<dyn std::error::Error>> {
         // println!("{}", &total);
     }
     println!("{}", &total);
-    // 55090
+    // Part 1: 55090
+
+    // --- Part Two ---
+    //     Your calculation isn't quite right. It looks like some of the digits are actually spelled
+    // out with letters: one, two, three, four, five, six, seven, eight, and nine also count as valid "digits".
+    //
+    //     Equipped with this new information, you now need to find the real first and last digit on each line. For example:
+    //
+    //     two1nine
+    // eightwothree
+    // abcone2threexyz
+    // xtwone3four
+    // 4nineeightseven2
+    // zoneight234
+    // 7pqrstsixteen
+    // In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76. Adding these together produces 281.
+    //
+    // What is the sum of all of the calibration values?
+    let text_numbers = vec!("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
+    total = 0;
+    for row in &data {
+        // println!("{:?}", row);
+        let mut first_found =false;
+        let mut first: u32 = 0;
+        let mut last: u32 = 0;
+        let mut build_string = String::new();
+
+        // ah, you dumdum: eightwo = 82, and we are not taking that into account!
+        // ok, so we go forwards, then backwards
+
+        // fowards
+        // println!("forwards");
+        for i in row[0].chars() {
+            // println!("{}",i);
+            // println!("{}", &build_string);
+            if i.is_digit(10){
+                first = i.to_digit(10).unwrap();
+                break;
+            }
+            else {
+                // ok, not a number, so let's build a string
+                build_string.push(i);
+                // yay, brute force
+                let mut j: u32 = 0;
+                for n in text_numbers.iter() {
+                    j += 1;
+                    if build_string.contains(n) {
+                        first  = j;
+                        first_found = true;
+                        // println!("found text");
+                        break;
+                    }
+                }
+                if first_found { break;}; // exit outer loop too
+            }
+        }
+        // println!("first found: {}", first);
+
+        // backwards
+        // println!("backwards");
+        build_string = String::default();
+        first_found = false;
+        for i in row[0].chars().rev() {
+            // println!("{}",i);
+            // println!("{}", &build_string);
+            if i.is_digit(10){
+                last = i.to_digit(10).unwrap();
+                break;
+            }
+            else {
+                // ok, not a number, so let's build a string
+                build_string.insert(0,i);
+                // yay, brute force
+                let mut j: u32 = 0;
+                for n in text_numbers.iter() {
+                    j += 1;
+                    if build_string.contains(n) {
+                        last  = j;
+                        // println!("found text");
+                        first_found = true;
+                        break;
+                    }
+                }
+                if first_found { break;}; // exit outer loop too
+            }
+        }
+        // println!("last found: {}", last);
+
+
+        // println!("{} {}", &first, &last);
+        // num_string.push(first);
+        // num_string.push(last);
+        total += (first * 10) + last;
+        // println!("{}", &total);
+    }
+    println!("{}", &total);
+
+    // 55214 is too high
+
 
     Ok(())
 
