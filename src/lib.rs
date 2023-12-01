@@ -9,7 +9,7 @@ pub enum InputType {
 }
 
 pub fn read_input(day: u8, input: InputType) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
-    
+
     let file_name = match input {
         InputType::Sample => format!("src/day{:02}_sample.txt",day),
         InputType::Data=> format!("src/day{:02}_input.txt",day),
@@ -28,7 +28,7 @@ pub fn read_input(day: u8, input: InputType) -> Result<Vec<Vec<String>>, Box<dyn
         data.push(words);
     }
 
-    println!("{:?}", data);
+    // println!("{:?}", data);
     Ok(data)
 }
 
