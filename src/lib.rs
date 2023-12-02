@@ -5,14 +5,16 @@ use std::io::{self, prelude::*, BufReader};
 
 pub enum InputType {
     Sample,
-    Data
+    Data,
+    Manual,
 }
 
-pub fn read_input(day: u8, input: InputType) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
+pub fn read_input(day: u8, input: InputType, manual_name: &str) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
 
     let file_name = match input {
         InputType::Sample => format!("src/day{:02}_sample.txt",day),
         InputType::Data=> format!("src/day{:02}_input.txt",day),
+        InputType::Manual => format!("src/{}", manual_name),
     };
     let file = File::open(file_name)?;
     let reader = BufReader::new(file);
