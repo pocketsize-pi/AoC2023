@@ -1,4 +1,5 @@
 use AoC2023::InputType;
+use std::cmp;
 
 pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Day 2");
@@ -52,6 +53,27 @@ pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     // Determine which games would have been possible if the bag had been loaded with only 12 red cubes,
     // 13 green cubes, and 14 blue cubes. What is the sum of the IDs of those games?
 
+    // --- Part Two ---
+    // The Elf says they've stopped producing snow because they aren't getting any water! He isn't sure why the water stopped; however, he can show you how to get to the water source to check it out for yourself. It's just up ahead!
+
+    // As you continue your walk, the Elf poses a second question: in each game you played, what is the fewest number of cubes of each color that could have been in the bag to make the game possible?
+
+    // Again consider the example games from earlier:
+
+    // Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+    // Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+    // Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+    // Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+    // Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
+    // In game 1, the game could have been played with as few as 4 red, 2 green, and 6 blue cubes. If any color had even one fewer cube, the game would have been impossible.
+    // Game 2 could have been played with a minimum of 1 red, 3 green, and 4 blue cubes.
+    // Game 3 must have been played with at least 20 red, 13 green, and 6 blue cubes.
+    // Game 4 required at least 14 red, 3 green, and 15 blue cubes.
+    // Game 5 needed no fewer than 6 red, 3 green, and 2 blue cubes in the bag.
+    // The power of a set of cubes is equal to the numbers of red, green, and blue cubes multiplied together. The power of the minimum set of cubes in game 1 is 48. In games 2-5 it was 12, 1560, 630, and 36, respectively. Adding up these five powers produces the sum 2286.
+
+    // For each game, find the minimum set of cubes that must have been present. What is the sum of the power of these sets?
+
     struct Cubes {
         red: u32,
         green: u32,
@@ -61,6 +83,8 @@ pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     let max_cubes = Cubes {red:12, green:13, blue:14};
     let max_val = max_cubes.red + max_cubes.green + max_cubes.blue;
     let mut total_games : u32 = 0;
+    let mut power_games : u32 = 0;
+
 
     for row in &data {
         let game_num = row[1][0..row[1].len() - 1].parse::<u32>().unwrap();//.chars().nth(0).unwrap().to_digit(10).unwrap();
@@ -68,6 +92,7 @@ pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
         // println!("game {}", game_num);
 
         let mut game_cubes = Cubes{red:0, green:0, blue:0};
+        let mut min_cubes = Cubes {red:0, green:0, blue:0};
         for i in (2..row.len()).step_by(2) {
 
             let num_cube = row[i].parse::<u32>().unwrap();
@@ -86,19 +111,31 @@ pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
                 {
                     // println!("Game {} not good", game_num);
                     invalid = true;
-                    break;
+                    // break;
+                    // if we don't break, but process them all, we can do both pt1 and pt2 together
 
                 }
+                // check min cubes
+                min_cubes.red = cmp::max(min_cubes.red, game_cubes.red);
+                min_cubes.green = cmp::max(min_cubes.green, game_cubes.green);
+                min_cubes.blue = cmp::max(min_cubes.blue, game_cubes.blue);
             }
         }
         if !invalid {
             total_games += game_num;
         }
+        // part two calculations
+
+        power_games += min_cubes.red * min_cubes.green * min_cubes.blue;
+        // println!("red {}, green {}, blue {}", min_cubes.red, min_cubes.green, min_cubes.blue);
+        // println!("power {}", min_cubes.red * min_cubes.green * min_cubes.blue);
 
     }
 
-    println!("{}", total_games);
+    println!("Part 1: {}", total_games);
     // 2369
+    println!("Part 2: {}", power_games);
+    // 66363
 
     Ok(())
 
