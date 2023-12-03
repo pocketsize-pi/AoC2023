@@ -4,7 +4,7 @@ use std::cmp;
 pub fn day02(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Day 2");
 
-    let mut data = AoC2023::read_input(2, input_type, manual_name)?;
+    let data = AoC2023::read_input(2, input_type, manual_name)?;
 
     // for row in &data {
     //     println!("{:?}", row);

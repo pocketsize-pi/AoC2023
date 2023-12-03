@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use AoC2023::InputType;
 
 pub fn day03(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -63,11 +64,18 @@ pub fn day03(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     let height = new_data.len();
     let nothing = '.';
 
+    #[derive(Hash)]
+    struct Coords {
+        r: u32,
+        c: u32,
+    }
+
     // utility function to get the diagonals
     // started as a function, the IDE told me to convert to a closure
     // I understood closures when I did the course, not any more!
-    let get_diagonal_values = |r: i32, c: i32| -> Vec<char> {
+    let get_diagonal_values = |r: i32, c: i32| -> (Vec<char>,Vec<(u32, u32)>) {
         let mut return_values: Vec<char> = Vec::new();
+        let mut return_coords: Vec<(u32, u32)> = Vec::new();
         let my_range : Vec<i32> = vec!(-1, 0, 1);
         for r_i in &my_range {
             for c_i in &my_range {
@@ -75,14 +83,20 @@ pub fn day03(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
                 let new_c = c + c_i;
                 if ! ((new_r < 0) | (new_r >= height as i32) | (new_c < 0) | (new_c >= width as i32)) {
                     return_values.push(new_data[new_r as usize][new_c as usize]);
+                    return_coords.push((new_r as u32, new_c as u32));
                 }
 
             }
         }
-        return_values
+        (return_values, return_coords)
     };
 
     let mut sum_of_parts : u32 = 0;
+
+
+
+    // let symbol_coords : Vec<Coords> = Vec::new();
+    let mut symbol_db  = HashMap::new();
 
     for r in 0..height {
         let mut in_a_number = false;
@@ -100,12 +114,26 @@ pub fn day03(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
                 // ok, it's a number, now what
                 // check all diagonals, if it is not a match already!
                 if !found_symbol {
-                    let diagonals = get_diagonal_values(r as i32,c as i32);
+                    let (diagonals, diag_coord) = get_diagonal_values(r as i32,c as i32);
                     // println!("{:?}", diagonals);
-                    for d_vals in diagonals {
-                        if !((d_vals==nothing) | d_vals.is_digit(10)) {
+                    for d_i in 0..diagonals.len() {
+                    // for d_vals in diagonals {
+                        let d_vals = &diagonals[d_i];
+                        let d_coords = &diag_coord[d_i];
+                        if !((*d_vals==nothing) | d_vals.is_digit(10)) {
                             // it's a symbol! we are good
                             found_symbol = true;
+
+                            // we've found a symbol, let's see what we need to do with it
+                            if !symbol_db.contains_key(d_coords) {
+                                symbol_db.insert(d_coords.clone(), 1);
+                            }
+                            else {
+                                // the symbol already exists
+                                // symbol_db[d_coords] = symbol_db[d_coords] +1;
+                                symbol_db.insert(d_coords.clone(), symbol_db[d_coords] +1);
+                            }
+
                             // we dont' need to stay here longer
                             break;
                         }
@@ -135,6 +163,106 @@ pub fn day03(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     // 13466731 is too high -> I wasn't breaking the number when it had a symbol in the middle 90&12
     // 553079 is correct!
 
+    // --- Part Two ---
+    // The engineer finds the missing part and installs it in the engine! As the engine springs to
+    // life, you jump in the closest gondola, finally ready to ascend to the water source.
+
+    // You don't seem to be going very fast, though. Maybe something is still wrong? Fortunately,
+    // the gondola has a phone labeled "help", so you pick it up and the engineer answers.
+
+    // Before you can explain the situation, she suggests that you look out the window. There stands
+    // the engineer, holding a phone in one hand and waving with the other. You're going so slowly
+    // that you haven't even left the station. You exit the gondola.
+
+    // The missing part wasn't the only issue - one of the gears in the engine is wrong. A gear
+    // is any * symbol that is adjacent to exactly two part numbers. Its gear ratio is the result of
+    // multiplying those two numbers together.
+
+    // This time, you need to find the gear ratio of every gear and add them all up so that the
+    // engineer can figure out which gear needs to be replaced.
+
+    // Consider the same engine schematic again:
+
+    // 467..114..
+    // ...*......
+    // ..35..633.
+    // ......#...
+    // 617*......
+    // .....+.58.
+    // ..592.....
+    // ......755.
+    // ...$.*....
+    // .664.598..
+    // In this schematic, there are two gears. The first is in the top left; it has part numbers
+    // 467 and 35, so its gear ratio is 16345. The second gear is in the lower right;
+    // its gear ratio is 451490. (The * adjacent to 617 is not a gear because it is only
+    // adjacent to one part number.) Adding up all of the gear ratios produces 467835.
+
+    // What is the sum of all of the gear ratios in your engine schematic?
+
+    // Ok, so these are all the symbols with only two numbers adjacent
+    let mut gear_sum : u32 = 0;
+    for (s_coord, s_num) in &symbol_db {
+        if *s_num == 2 {
+            // println!("{} {}", s_coord.0, s_coord.1);
+
+            // let's get the diagonals again!
+            let mut visited_coords : Vec<(u32, u32)> = Vec::new();
+            let (diagonals, diag_coord) = get_diagonal_values(s_coord.0 as i32,s_coord.1 as i32);
+            let mut local_product : u32 = 1;
+            for d_i in 0..diagonals.len() {
+                // for d_vals in diagonals {
+
+                let d_vals = &diagonals[d_i];
+                let d_coords = &diag_coord[d_i];
+                // is this a non-visited coordinate?
+                if !visited_coords.contains(d_coords) {
+                    if d_vals.is_digit(10) {
+                        let mut build_num = String::default();
+
+                        build_num.insert(0,new_data[d_coords.0 as usize][d_coords.1 as usize]);
+                        visited_coords.push(*d_coords);
+                        // go back
+                        let mut new_c = d_coords.1;
+                        if d_coords.1 >=1 {
+                            new_c = d_coords.1 - 1;
+                            while new_data[d_coords.0 as usize][new_c as usize].is_digit(10) {
+                                build_num.insert(0, new_data[d_coords.0 as usize][new_c as usize]);
+                                visited_coords.push((d_coords.0, new_c));
+                                if new_c >=1 { new_c = new_c - 1;}
+                                else {break;}
+                            }
+                        }
+                        // now go forwards
+                        if d_coords.1 < (width as u32 -1) {
+                            new_c = d_coords.1 + 1;
+
+                            while new_data[d_coords.0 as usize][new_c as usize].is_digit(10) {
+                                build_num.insert(build_num.len(), new_data[d_coords.0 as usize][new_c as usize]);
+                                visited_coords.push((d_coords.0, new_c));
+
+                                if new_c < (width as u32 -1) { new_c = new_c + 1;}
+                                else {break;}
+                            }
+                        }
+
+                        // we are done with the number, let's store it
+                        // println!("{}", build_num);
+                        local_product = local_product * build_num.parse::<u32>().unwrap();
+                    }
+
+                }
+
+            }
+
+            //  and now we add all the local products
+            gear_sum += local_product;
+
+        }
+    }
+
+    println!("Part 2: {}", gear_sum);
+    // 84363105 is the right answer
 
     Ok(())
 }
