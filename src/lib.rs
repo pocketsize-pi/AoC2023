@@ -89,3 +89,11 @@ pub fn floyd_warshall(mut graph: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
     }
     graph
 }
+
+pub fn string_to_u32 (input: &String) -> u32 {
+    input.parse::<u32>().unwrap()
+}
+
+pub fn string_to_u64 (input: &String) -> u64 {
+    input.parse::<u64>().unwrap()
+}
