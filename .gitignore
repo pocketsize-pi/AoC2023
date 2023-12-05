@@ -16,3 +16,6 @@ Cargo.lock
 # IntelliJ IDE
 *idea/
 AoC2023.iml
+
+# And the input files!
+src/day??_input.txt
