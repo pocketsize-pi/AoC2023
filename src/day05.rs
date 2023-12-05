@@ -1,3 +1,5 @@
+use std::cmp::min;
+use std::mem::needs_drop;
 use AoC2023::InputType;
 
 pub fn day05(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -278,8 +280,98 @@ pub fn day05(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     println!("Part 1: {:?}", loc_nums.iter().min().unwrap());
     // 199602917
 
+    // --- Part Two ---
+    // Everyone will starve if you only plant such a small number of seeds. Re-reading the almanac,
+    // it looks like the seeds: line actually describes ranges of seed numbers.
+
+    // The values on the initial seeds: line come in pairs. Within each pair, the first value is
+    // the start of the range and the second value is the length of the range. So, in the first
+    // line of the example above:
+
+    // seeds: 79 14 55 13
+    // This line describes two ranges of seed numbers to be planted in the garden. The first range
+    // starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92. The second range
+    // starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.
+
+    // Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.
+
+    // In the above example, the lowest location number can be obtained from seed number 82,
+    // which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45,
+    // humidity 46, and location 46. So, the lowest location number is 46.
+
+    // Consider all of the initial seed numbers listed in the ranges on the first line of the almanac.
+    // What is the lowest location number that corresponds to any of the initial seed numbers?
+
+    // Brute force ftw
+    // expand seeds
+
+    let mut min_value : u64 = u64::MAX;
+    let mut new_seeds : Vec<u64> = Vec::new();
+
+    let min_pain : usize= usize::MAX;
+
+    for i in (0..seed_numbers.len()).step_by(2) {
+        let source = seed_numbers[i];
+        let range = seed_numbers[i+1];
+        new_seeds.push(source);
+        new_seeds.push(source + range);
+
+        // for j in 0..range {
+        //     let mut new_seeds : Vec<u64> = Vec::new();
+        //     new_seeds.push(source + j);
+        //
+        //     // min_value = min(loc_nums[0],min_value);
+        // }
+    }
+    new_seeds.sort();
+    let soil_nums2 = get_next_level_down(&new_seeds, &seed_to_soil);
+    let fert_nums2 = get_next_level_down(&soil_nums2, &soil_to_fert);
+    let water_nums2 = get_next_level_down(&fert_nums2, &fert_to_water);
+    let light_nums2 = get_next_level_down(&water_nums2, &water_to_light);
+    let temp_nums2 = get_next_level_down(&light_nums2, &light_to_temp);
+    let humid_nums2 = get_next_level_down(&temp_nums2, &temp_to_humid);
+    let loc_nums2 = get_next_level_down(&humid_nums2, &humid_to_loc);
+
+    println!("{:?}", new_seeds);
+    println!("{:?}", loc_nums2);
+    let min_loc = loc_nums2.iter().min().unwrap();
+    println!("Part 2: {:?}", min_loc);
+    let min_index = loc_nums2.iter().position(|&r| r == *min_loc).unwrap();
+    println!("Part 2: {:?}", min_index);
+
+    // we sort them in order, and do two ranges around the seed values that give the smallest edge
+
+    // ok, so I know it's 14, I'm just going to hardcode this rather than do it with code
+    let mut less_seeds : Vec<u64> = Vec::new();
+    for i in new_seeds[12]..new_seeds[13] {
+        less_seeds.push(i);
+    }
+    for i in new_seeds[14]..new_seeds[15] {
+        less_seeds.push(i);
+    }
+    println!("{:?}", less_seeds.len());
+
+    for seed in less_seeds {
+        let soil_nums3 = get_next_level_down(&vec![seed], &seed_to_soil);
+        let fert_nums3 = get_next_level_down(&soil_nums3, &soil_to_fert);
+        let water_nums3 = get_next_level_down(&fert_nums3, &fert_to_water);
+        let light_nums3 = get_next_level_down(&water_nums3, &water_to_light);
+        let temp_nums3 = get_next_level_down(&light_nums3, &light_to_temp);
+        let humid_nums3 = get_next_level_down(&temp_nums3, &temp_to_humid);
+        let loc_nums3 = get_next_level_down(&humid_nums3, &humid_to_loc);
+        min_value = min(loc_nums3[0],min_value);
+    }
 
 
+
+    // println!("{:?}", new_seeds);
+    // println!("{:?}", loc_nums2);
+    // let min_loc = loc_nums3.iter().min().unwrap();
+    // println!("Part 2: {:?}", min_loc);
+    // let min_index = loc_nums3.iter().position(|&r| r == *min_loc).unwrap();
+    // println!("Part 2: {:?}", min_index);
+    println!("Part 2: {:?}", min_value);
+    // yes!!!!! 2254686 Brute force saves the day!
 
     Ok(())
 }
