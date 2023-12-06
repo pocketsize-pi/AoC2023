@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use AoC2023::InputType;
 use AoC2023::string_to_u32;
+use AoC2023::string_to_u64;
 
 pub fn day06(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Day 6");
@@ -91,6 +92,51 @@ pub fn day06(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     }
     println!("Part 1: {total_wins}");
     // 281600 - that was easy, I really worry now about part 2!
+
+    // --- Part Two ---
+    // As the race is about to start, you realize the piece of paper with race times and
+    // record distances you got earlier actually just has very bad kerning.
+    // There's really only one race - ignore the spaces between the numbers on each line.
+    //
+    // So, the example from before:
+    //
+    // Time:      7  15   30
+    // Distance:  9  40  200
+    // ...now instead means this:
+    //
+    // Time:      71530
+    // Distance:  940200
+    // Now, you have to figure out how many ways there are to win this single race.
+    // In this example, the race lasts for 71530 milliseconds and the record distance you need
+    // to beat is 940200 millimeters. You could hold the button anywhere from 14 to 71516
+    // milliseconds and beat the record, a total of 71503 ways!
+    //
+    // How many ways can you beat the record in this one much longer race?
+
+    let mut kerned_time = String::new();
+    let mut kerned_distance = String::new();
+    for i in 1..data[0].len() {
+        // kerned_records.push((string_to_u32(&data[0][i]),string_to_u32(&data[1][i])));
+        kerned_time.push_str(&data[0][i]);
+        kerned_distance.push_str(&data[1][i]);
+    }
+    let kerned_records = (string_to_u64(&kerned_time), string_to_u64(&kerned_distance));
+    println!("{:?}", kerned_records);
+
+    let time = kerned_records.0;
+    let record_distance = kerned_records.1;
+    let mut kerned_wins : u32 = 0;
+    for push_button in 1..time {
+        let distance = (time - push_button) * push_button;
+        // println!("{}",&distance);
+        if distance > record_distance {
+            kerned_wins += 1;
+        }
+    }
+
+    println!("Part 2: {kerned_wins}");
+    // 33875953
+    // dang, that was easy!
 
     Ok(())
 }
