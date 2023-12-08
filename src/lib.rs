@@ -97,3 +97,7 @@ pub fn string_to_u32 (input: &String) -> u32 {
 pub fn string_to_u64 (input: &String) -> u64 {
     input.parse::<u64>().unwrap()
 }
+
+pub fn string_to_chars(input: &String) -> Vec<char> {
+    input.chars().collect()
+}
