@@ -98,6 +98,10 @@ pub fn string_to_u64 (input: &String) -> u64 {
     input.parse::<u64>().unwrap()
 }
 
+pub fn string_to_i64 (input: &String) -> i64 {
+    input.parse::<i64>().unwrap()
+}
+
 pub fn string_to_chars(input: &String) -> Vec<char> {
     input.chars().collect()
 }
