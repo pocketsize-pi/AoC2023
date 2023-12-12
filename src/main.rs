@@ -10,6 +10,8 @@ pub mod day06;
 pub mod day07;
 pub mod day08;
 pub mod day09;
+// pub mod day10;
+pub mod day11;
 
 fn main() -> Result<(), Box<dyn std::error::Error>>{
     println!("Hello, Advent of Code!");
@@ -47,6 +49,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
                 72=> day07::day72(input_type, manual_name)?,
                 8 => day08::day08(input_type, manual_name)?,
                 9 => day09::day09(input_type, manual_name)?,
+                // 10=> day10::day10(input_type, manual_name)?,
+                11=> day11::day11(input_type, manual_name)?,
                 _others => day00::day00(input_type, manual_name)?}
         }
         else {
