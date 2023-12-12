@@ -34,12 +34,14 @@ pub fn read_input(day: u8, input: InputType, manual_name: &str) -> Result<Vec<Ve
     Ok(data)
 }
 
-pub fn manhattan_distance((x1, y1): (&i32, &i32), (x2, y2): (&i32, &i32)) -> i32 {
-    let x_diff = (x1 - x2).abs();
-    let y_diff = (y1 - y2).abs();
-
-    x_diff + y_diff
+pub fn manhattan_distance(point1: &Point, point2: &Point) -> i32 {
+    // let x_diff = (x1 - x2).abs();
+    // let y_diff = (y1 - y2).abs();
+    //
+    // x_diff + y_diff
+    (point1.r - point2.r).abs() + (point1.c - point2.c).abs()
 }
+
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Point {
