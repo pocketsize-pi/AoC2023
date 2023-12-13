@@ -51,6 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
                 9 => day09::day09(input_type, manual_name)?,
                 // 10=> day10::day10(input_type, manual_name)?,
                 11=> day11::day11(input_type, manual_name)?,
+                112=> day11::day112(input_type, manual_name)?,
                 _others => day00::day00(input_type, manual_name)?}
         }
         else {
