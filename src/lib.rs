@@ -2,6 +2,7 @@
 
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
+use crate::Direction::{East, North, South, West};
 
 pub enum InputType {
     Sample,
@@ -135,6 +136,22 @@ pub enum Direction {
     NorthWest,
     SouthEast,
     SouthWest,
+}
+
+pub enum UdlrDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+pub fn get_direction (udlr_dir: &UdlrDirection) -> Direction {
+    match udlr_dir {
+        UdlrDirection::Up => {North}
+        UdlrDirection::Down => {South}
+        UdlrDirection::Left => {West}
+        UdlrDirection::Right => {East}
+    }
 }
 
 pub fn move_point(point: &Point, direction: Direction) -> Point {
