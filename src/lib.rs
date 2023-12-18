@@ -169,6 +169,21 @@ pub fn move_point(point: &Point, direction: Direction) -> Point {
     new_point
 }
 
+pub fn move_point_length(point: &Point, direction: Direction, length: &i32) -> Point {
+    let mut new_point : Point = Point { c: point.c, r: point.r };
+    match direction {
+        Direction::North => new_point.r -= length,
+        Direction::South => new_point.r += length,
+        Direction::East => new_point.c += length,
+        Direction::West => new_point.c -= length,
+        Direction::NorthEast => {new_point.r -= 1; new_point.c += 1;}
+        Direction::NorthWest => {new_point.r -= 1; new_point.c -= 1;}
+        Direction::SouthEast => {new_point.r += 1; new_point.c += 1;}
+        Direction::SouthWest => {new_point.r += 1; new_point.c -= 1;}
+    }
+    new_point
+}
+
 pub fn move_by_offset(point: &Point, offset: &Point) -> Point {
     let mut new_point : Point = Point { c: point.c, r: point.r };
     match offset {

@@ -17,7 +17,7 @@ pub fn day18(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
 
 
     let mut dig_plan = Vec::new();
-    let mut shoelace_vertices = Vec::new();
+
     for row in &data {
         // println!("{:?}", row);
         let mut instruction = DigInstr {dir:North, length:0, colour: String::new()};
@@ -42,6 +42,7 @@ pub fn day18(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     let mut max_col = 0;
     let mut min_col = 0;
     let mut current_point = Point{r:0, c:0};
+    let mut shoelace_vertices = Vec::new();
     dig_actual.push(current_point);
     shoelace_vertices.push(current_point);
 
@@ -115,6 +116,97 @@ pub fn day18(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std
     // 69698 still too low
     // 70026 finally
 
+    Ok(())
+}
+
+pub fn day182(input_type: InputType, manual_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    println!("Day 18 - part 2");
+
+
+    let data = AoC2023::read_input(18, input_type, manual_name)?;
+
+    struct DigInstr {
+        dir: Direction,
+        length: u32,
+        colour: String,
+    }
+
+    let mut dig_plan = Vec::new();
+
+    for row in &data {
+        // println!("{:?}", row);
+        let mut instruction = DigInstr { dir: North, length: 0, colour: String::new() };
+        // println!("{}", row[2]);
+        let mut hex_as_char = string_to_chars(&row[2]);
+        // println!("{:?}", hex_as_char);
+        // remove brakets
+        hex_as_char.remove(0);
+        // println!("{:?}", hex_as_char);
+        hex_as_char.remove(hex_as_char.len()-1);
+        // println!("{:?}", hex_as_char);
+
+        // direction
+        let udlr = hex_as_char.remove(hex_as_char.len()-1);
+        // println!("{}", udlr);
+        match udlr {
+            '0' => instruction.dir = East,
+            '1' => instruction.dir = South,
+            '2' => instruction.dir = West,
+            _ => instruction.dir = North,
+        }
+
+        // length
+        hex_as_char.remove(0); // remove #
+        let distance_string : String = hex_as_char.into_iter().collect();
+        // println!("string {}", distance_string);
+        let z = u32::from_str_radix(distance_string.as_str(), 16).unwrap();
+        instruction.length = z;
+        // println!("meters {}", z);
+
+        dig_plan.push(instruction);
+    }
+
+    let mut dig_actual = Vec::new();
+    let mut max_row = 0;
+    let mut min_row = 0;
+    let mut max_col = 0;
+    let mut min_col = 0;
+    let mut current_point = Point { r: 0, c: 0 };
+    let mut shoelace_vertices = Vec::new();
+    dig_actual.push(current_point);
+    shoelace_vertices.push(current_point);
+    let mut perimeter: i64 = 0;
+
+    for (i, instruction) in dig_plan.iter().enumerate() {
+        current_point = move_point_length(&current_point, instruction.dir, &(instruction.length as i32));
+        perimeter += instruction.length as i64;
+        // add to shoelace list
+        shoelace_vertices.push(current_point);
+        // check limits
+        max_row = max(max_row, current_point.r);
+        min_row = min(min_row, current_point.r);
+        max_col = max(max_col, current_point.c);
+        min_col = min(min_col, current_point.c);
+    }
+
+    // Shoelace
+    let mut area: i64 = 0;
+    let mut area1: i64 = 0;
+    let mut area2: i64 = 0;
+    for v in 0..(shoelace_vertices.len() - 1) {
+        let p1 = shoelace_vertices[v];
+        let p2 = shoelace_vertices[v + 1];
+        // println!("p1 {:?}", p1);
+        // println!("p2 {:?}", p2);
+        area1 += p1.r as i64 * p2.c as i64;
+        area2 += p1.c as i64 * p2.r as i64;
+    }
+    area = (area1 - area2).abs();
+    area = area / 2;
+    area += (perimeter as i64 / 2) + 1;
+
+    println!("Part 2: {}", area);
+    // 68548301037382 refreshingly easy
 
     Ok(())
 }
